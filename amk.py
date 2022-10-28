@@ -11,7 +11,7 @@ window.icon = "Delacro-Id-Games.ico"
 app = Ursina()
 
 
-DirectionalLight(y=2, z=3, shadows=True)
+DirectionalLight(y=3, z=3, shadows=True)
 
 
 table = Entity(model='Table.obj',
