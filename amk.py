@@ -1,5 +1,5 @@
 import random
-from turtle import delay
+
 from ursina import *  # type: ignore
 from ursina.shaders import fxaa_shader,  lit_with_shadows_shader
 
