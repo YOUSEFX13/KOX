@@ -79,10 +79,10 @@ Terning = Entity(model='dice.obj',
 Terning.rotation = (0, 270, -45)
 Terning.position = (0, 0, -1.03368)
 
-Terning2 = Entity(model='dice.obj',
-                  texture='dice.png', shader=lit_with_shadows_shader,  scale=0.3)
-Terning2.rotation = (0, 270, -45)
-Terning2.position = (0, 0.862854, -0.47929)
+Terning_2 = Entity(model='dice.obj',
+                   texture='dice.png', shader=lit_with_shadows_shader,  scale=0.3)
+Terning_2.rotation = (0, 270, -45)
+Terning_2.position = (0, 0.862854, -0.47929)
 
 Terning_tal_rot = {1: {'x': '0', 'y': '270', 'z': '-45'},
                    2: {'x': '45', 'y': '360', 'z': '-270'},
@@ -92,8 +92,11 @@ Terning_tal_rot = {1: {'x': '0', 'y': '270', 'z': '-45'},
                    6: {'x': '-128', 'y': '180', 'z': '1'}, }
 
 
-# tal_text = Text(text='tal:0')
-# tal_text.position = (-0.067835, -0.13382, 0.0839725)
+tal_text2 = Text(text='Terning #2:  0')
+tal_text2.position = (0.047835, -0.2382, 0.0839725)
+
+tal_text = Text(text='Terning #1:  0')
+tal_text.position = (-0.177835, -0.2382, 0.0839725)
 
 stat_text = Text(text='')
 stat_text.position = (0, -0.38, -0.250944)
@@ -133,17 +136,31 @@ Blyat = set(range(1, 10))
 
 closewp_b = Button(text='Ok!', color=color.azure, )
 
+closego_b = Button(text='Try again?', color=color.azure, )
+game_won_b = Button(text='Try again?', color=color.azure, )
+
+game_won = WindowPanel(
+    title='You Won!',
+    content=(
+        game_won_b, Text("""
+        ZAAAAAMN YOU WON
+        """, scale=0.7)
+
+    ),
+    popup=True,
+    enabled=True)
+
 
 wp = WindowPanel(
     title='Rules',
     content=(
         closewp_b, Text("""
     Rules:
-    A round begins with all the tiles in the down position. 
-    A player will roll two dice and add them together. 
-    The player will then lower an equal amount of tiles. 
-    For example, if the player rolls a total of 9, 
-    he/she can lower any tiles to 9.
+    A round begins with all the tiles in the up position.
+    A player will roll two dice and add them together.
+    The player will then lower an equal amount of tiles.
+    For example, if the player rolls a total of 9,
+    he/she can lower any tiles equal 9.
 
     * 9
     * 8 and 1
@@ -151,12 +168,25 @@ wp = WindowPanel(
     * 6 and 3
     * 5 and 4
     * 6, 2 and 1
-    *4, 3, and 2
-    
-    The player continues to roll as long as 
+    * 4, 3, and 2
+
+    The player continues to roll as long as
     he/she has an equal number of tiles to lower.
-    When no more tiles can be lowered the game is over. 
+    When no more tiles can be lowered the game is over.
     The player will win by closing the box!
+        """, scale=0.7)
+
+    ),
+    popup=True,
+    enabled=True
+
+)
+
+game_over = WindowPanel(
+    title='Game over',
+    content=(
+        closego_b, Text("""
+   You LOST! HAHAHAHHAHAHAHA
         """, scale=0.7)
 
     ),
@@ -164,7 +194,13 @@ wp = WindowPanel(
     enabled=True
 )
 
+
+game_won.enabled = False
+
 wp.position = (0, 0.30, -0.250944)
+game_over.position = (0, 0.30, -0.250944)
+game_over.enabled = False
+
 
 submit_b.enabled = False
 roll_b.enabled = False
@@ -179,12 +215,15 @@ def disable_wp():
 
 
 def reset():
+    roll_b.enabled = True
+
     global Blyat
     Blyat = set(range(1, 10))
     Terning.animate_x(-0.067835, duration=1, loop=False)
-    Terning2.animate_x(-0.067835, duration=1, loop=False)
+    Terning_2.animate_x(-0.067835, duration=1, loop=False)
     Terning.animate_rotation(Vec3(0, 270, -45), 0.1)
-    Terning2.animate_rotation(Vec3(0, 270, -45), 0.1)
+    Terning_2.animate_rotation(Vec3(0, 270, -45), 0.1)
+    game_over.enabled = True
 
 
 def roll1():
@@ -192,7 +231,7 @@ def roll1():
     global dicestat
     dicestat = 900
     Terning.animate_x(-4.6, duration=1, loop=False)
-    Terning2.animate_x(4.6, duration=1, loop=False)
+    Terning_2.animate_x(4.6, duration=1, loop=False)
 
 
 def Bricks_update():
@@ -202,11 +241,16 @@ def Bricks_update():
         else:
             bricks[i].animate_rotation_z(150, 1)
     print(brick_stats)
+    if brick_stats == [True, True, True, True, True, True, True, True]:
+        game_won.enabled = True
+    else:
+        game_won.enabled = False
+        pass
 
 
 def roll2():
     Terning.animate_x(4.6, duration=1, loop=False)
-    Terning2.animate_x(-4.6, duration=1, loop=False)
+    Terning_2.animate_x(-4.6, duration=1, loop=False)
 
 
 def rollran():
@@ -216,24 +260,29 @@ def rollran():
     dice_x_2 = random.uniform(-4, 4)
 
     Terning.animate_x(dice_x, duration=1, loop=False)
-    Terning2.animate_x(dice_x_2, duration=1, loop=False)
+    Terning_2.animate_x(dice_x_2, duration=1, loop=False)
 
     dicestat = 0
 
     Terning.animate_rotation(Vec3(0, 270, -45), 0.1)
-    Terning2.animate_rotation(Vec3(0, 270, -45), 0.1)
+    Terning_2.animate_rotation(Vec3(0, 270, -45), 0.1)
 
     diceroll_1 = random.randint(1, 6)
     Terning.animate_rotation(Vec3(float((Terning_tal_rot[diceroll_1])['x']),
                                   float((Terning_tal_rot[diceroll_1])['y']),
                                   float((Terning_tal_rot[diceroll_1])['z'])), 1)
+    tal_text.text = ("Terning 1: "+str(diceroll_1))
 
     diceroll_2 = random.randint(1, 6)
-    Terning2.animate_rotation(Vec3(float((Terning_tal_rot[diceroll_2])['x']),
-                                   float((Terning_tal_rot[diceroll_2])['y']),
-                                   float((Terning_tal_rot[diceroll_2])['z'])), 1)
+    Terning_2.animate_rotation(Vec3(float((Terning_tal_rot[diceroll_2])['x']),
+                                    float((Terning_tal_rot[diceroll_2])['y']),
+                                    float((Terning_tal_rot[diceroll_2])['z'])), 1)
+
+    tal_text2.text = ("Terning 2: "+str(diceroll_2))
 
     diceRolled = diceroll_1 + diceroll_2
+
+    roll_b.enabled = False
 
 
 def test():
@@ -264,6 +313,7 @@ def test():
                 brick_stats[i-1] = True
                 invoke(Bricks_update)
         CykaBlyat.text = ''
+        roll_b.enabled = True
     except:
         stat_text.text = "input numbers"
 
@@ -278,7 +328,13 @@ submit_b.on_click = test
 roll_b.on_click = roll
 
 wp.on_click = disable_wp
+
+game_over.on_click = game_over.disable
 closewp_b.on_click = disable_wp
+closego_b.on_click = game_over.disable
+
+game_won_b.on_click = game_won.disable
+
 
 Bricks_update()
 
@@ -288,9 +344,14 @@ def update():
     Terning.rotation_z += time.dt * dicestat  # type: ignore
     Terning.rotation_y -= time.dt * dicestat  # type: ignore
     Terning.rotation_x += time.dt * dicestat  # type: ignore
-    Terning2.rotation_z += time.dt * dicestat   # type: ignore
-    Terning2.rotation_y -= time.dt * dicestat   # type: ignore
-    Terning2.rotation_x += time.dt * dicestat   # type: ignore
+    Terning_2.rotation_z += time.dt * dicestat   # type: ignore
+    Terning_2.rotation_y -= time.dt * dicestat   # type: ignore
+    Terning_2.rotation_x += time.dt * dicestat   # type: ignore
+
+
+def input(key):
+    if key == 'enter':
+        test()
 
 
 app.run()
