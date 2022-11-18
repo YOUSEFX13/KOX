@@ -1,8 +1,16 @@
+
+# Her importerer vi de moduler som vi skal bruge såsom random, ursina ,fxxa_shader og lit_with_shadows_shader
+
 import random
 
 from ursina import *  # type: ignore
 from ursina.shaders import fxaa_shader,  lit_with_shadows_shader
 
+# Vi sætter vinduet til ”borderless = False” på denne måde åbner vi den med borders
+# Her bestemmer vi  vindue titlen til ”Shut Da Bux”
+# Her bestemmer vi så at der er antialiasing i spillet for at gøre spillet bedre at kigge på
+# Her sætter vi en variabel til ursina() for at senere kunne kalde på den via app.run()
+# Her sætter vi noget belysning op da vi gerne ville have skygger i spillet
 
 window.borderless = False
 window.title = "Shut Da Bux"
@@ -20,6 +28,32 @@ table = Entity(model='Table.obj',
 table.position = Vec3(0.5, -0.3, 0)
 table.rotation = (0, 270, -45)
 
+
+'''
+Først definer vi vores 3d objekter og her bruger man klassen Entity.
+
+Vi vælger først modellen (model='modelnavn.fil').
+Vi giver den noget texture for at give den nogen farver osv. (texture = modeletstext.fil) 
+
+så har vi også shader som i denne situation gøre så vi har skygger osv.
+ 
+(shader=lit_with_shadows_shader) og scale hvis det er nødvendigt (scale=int/float)
+
+
+Vi har vec3 hvilke er x, y, z som er punkter i en 3d verden.
+Vi sat værdien til at den at skulle være indenfor Kameras synsfelt
+
+Her har vi definer rotationen så table vender mod os 
+
+Vi sat værdien til at den at skulle være indenfor tables spille areal
+
+her definer vi terning position 
+
+her definer vi terning rotation
+
+
+
+'''
 
 Brick_1 = Entity(model='1.obj', parent=table,
                  texture='1.png', shader=lit_with_shadows_shader,)
@@ -84,6 +118,9 @@ Terning_2 = Entity(model='dice.obj',
 Terning_2.rotation = (0, 270, -45)
 Terning_2.position = (0, 0.862854, -0.47929)
 
+
+#  Terning_tal_rot listen bruger vi til at definer rotations værdier i forhold til tallet som skal vises
+
 Terning_tal_rot = {1: {'x': '0', 'y': '270', 'z': '-45'},
                    2: {'x': '45', 'y': '360', 'z': '-270'},
                    3: {'x': '-180', 'y': '95', 'z': '30'},
@@ -92,6 +129,11 @@ Terning_tal_rot = {1: {'x': '0', 'y': '270', 'z': '-45'},
                    6: {'x': '-128', 'y': '180', 'z': '1'}, }
 
 
+'''
+ Her definer vi tekst felter  
+
+ Her definer vi tekst felternes positioner
+'''
 tal_text2 = Text(text='Terning #2:  0')
 tal_text2.position = (0.047835, -0.2382, 0.0839725)
 
@@ -101,6 +143,12 @@ tal_text.position = (-0.177835, -0.2382, 0.0839725)
 stat_text = Text(text='')
 stat_text.position = (0, -0.38, -0.250944)
 
+
+# Her definer vi inputfelt hvor vi kan tast dit svar ind
+
+
+# Her definer vi position
+
 CykaBlyat = InputField(default_value='', label='', limit_content_to=',0123456789',
                        max_lines=1, character_limit=24)
 
@@ -108,6 +156,9 @@ CykaBlyat = InputField(default_value='', label='', limit_content_to=',0123456789
 CykaBlyat.position = (0, -0.30, -0.250944)
 
 
+#  Her definer vi knapper til at spille spillet
+
+#  Her definer vi positioner til knapperne
 submit_b = Button(text='Submit ', color=color.black,
                   scale=.125, text_origin=(0, 0))
 
@@ -118,27 +169,34 @@ roll_b = Button(text='Roll', color=color.black,
 
 roll_b.position = (-0.4, -0.30, -0.250944)
 
-
+# her definer vi en liste som vi bruger til at kontroleere om vi skal åbne eller lukke
 global brick_stats
 
 brick_stats = [False, False, False, False, False, False, False, False, False]
 
 
+# dicestats bruges til at definer om den rotere lidt randomly når den er på 0 så rotere i
 global dicestat
 dicestat = 0
 
+
+# her har vi bricks varieabler sat inde i ind liste for at gøre det næmære
 bricks = [Brick_1, Brick_2, Brick_3, Brick_4,
           Brick_5, Brick_6, Brick_7, Brick_8, Brick_9]
+
+# blyat er vores mpde at sætte et tal række op  det den basically gøre er at lave en liste fra 1 til 9
 global Blyat
 
 Blyat = set(range(1, 10))
 
-
+# her definer vi knapper
 closewp_b = Button(text='Ok!', color=color.azure, )
 
 closego_b = Button(text='Try again?', color=color.azure, )
 game_won_b = Button(text='Try again?', color=color.azure, )
 
+
+#  her definer vi paneler ligesom game over rules og game won og det er pop ups som kommer i staten fx rules
 game_won = WindowPanel(
     title='You Won!',
     content=(
@@ -163,17 +221,21 @@ wp = WindowPanel(
     he/she can lower any tiles equal 9.
 
     * 9
-    * 8 and 1
-    * 7 and 2
-    * 6 and 3
-    * 5 and 4
-    * 6, 2 and 1
-    * 4, 3, and 2
+    * 8, 1
+    * 7, 2
+    * 6, 3
+    * 5, 4
+    * 6, 2, 1
+    * 4, 3, 2
 
     The player continues to roll as long as
     he/she has an equal number of tiles to lower.
     When no more tiles can be lowered the game is over.
     The player will win by closing the box!
+
+
+
+    Do NOT use other letters than english letters. it Will crash
         """, scale=0.7)
 
     ),
@@ -186,7 +248,29 @@ game_over = WindowPanel(
     title='Game over',
     content=(
         closego_b, Text("""
-   You LOST! HAHAHAHHAHAHAHA
+   L + ratio + wrong + get a job + unfunny + 
+
+   you fell off + never liked you anyway + cope 
+   
+   + ur allergic to gluten + don't care + cringe ur a kid + 
+   
+   literally shut the fuck up + galileo did it better + 
+   
+   your avi was made in MS Excel + 
+   
+   ur bf is kinda ugly + i have more subscribers + 
+   
+   owned + ur a toddler + reverse double take back + 
+   
+   u sleep in a different bedroom from your wife + 
+   
+   get rekt + i said it better + u smell + copy + 
+   
+   who asked + dead game + seethe + ur a coward + 
+   
+   stay mad + you drive a fiat 500 + yo mama + 
+   
+   plus ur mind numbingly stupid 
         """, scale=0.7)
 
     ),
@@ -194,7 +278,7 @@ game_over = WindowPanel(
     enabled=True
 )
 
-
+# game  won paneeled er slået fra hvilke er false
 game_won.enabled = False
 
 wp.position = (0, 0.30, -0.250944)
@@ -207,12 +291,16 @@ roll_b.enabled = False
 CykaBlyat.enabled = False
 
 
+# her har vi en funkton som lukker for rules
+
 def disable_wp():
     wp.enabled = False
     submit_b.enabled = True
     roll_b.enabled = True
     CykaBlyat.enabled = True
 
+
+# denne funktion resetter bricksne til deres start position
 
 def reset():
     roll_b.enabled = True
@@ -225,6 +313,8 @@ def reset():
     Terning_2.animate_rotation(Vec3(0, 270, -45), 0.1)
     game_over.enabled = True
 
+# roll1 rykker terning 1 til venstre og terning 2 til højre
+
 
 def roll1():
 
@@ -232,6 +322,8 @@ def roll1():
     dicestat = 900
     Terning.animate_x(-4.6, duration=1, loop=False)
     Terning_2.animate_x(4.6, duration=1, loop=False)
+
+# bricks_update funktionen tjekker om listen brick_stat er ændret vis 1 værdi i listen er true og lukker for det
 
 
 def Bricks_update():
@@ -248,9 +340,13 @@ def Bricks_update():
         pass
 
 
+# roll2 rykker terning 2 til venstre og terning 1 til højre
+
 def roll2():
     Terning.animate_x(4.6, duration=1, loop=False)
     Terning_2.animate_x(-4.6, duration=1, loop=False)
+
+   # det er her hvor vi har tilfældigheder via random modulet
 
 
 def rollran():
@@ -285,6 +381,8 @@ def rollran():
     roll_b.enabled = False
 
 
+# test tjekker for om der er tomt i input feltet så det ikke crasher
+# den tjekker også om du prøver at snyde
 def test():
 
     try:
@@ -317,6 +415,8 @@ def test():
     except:
         stat_text.text = "input numbers"
 
+# roll tager alle roll funktioner og sætter dem sammen til at bruge det til en knap
+
 
 def roll():
     invoke(roll1)
@@ -337,6 +437,8 @@ game_won_b.on_click = game_won.disable
 
 
 Bricks_update()
+
+# denne funktion burde kører vær frame det bruges til at rotere tærningen lidt randomt
 
 
 def update():
